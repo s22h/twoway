@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Test</title>
+	</head>
+	<body>
+		<input type="text" data-bind="value: input" placeholder="Test Input">
+		<p>Inline binding: <span data-bind="text: input"></span>.</p>
+		<p>JS binding: <span id="bindme"></span>.</p>
+		<button>Click</button>
+
+		<script src="twoway.js"></script>
+		<script src="test.js"></script>
+	</body>
+</html>
