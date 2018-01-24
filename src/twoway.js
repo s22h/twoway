@@ -19,14 +19,18 @@
 							this._data[bindProperty.variable].value = value;
 							this._data[bindProperty.variable].elements.forEach(function (el) {
 								switch (el.property) {
-									case "value":
-									case "innerHTML": {
-										el.element[el.property] = value;
+									case "html": {
+										el.element.innerHTML = value;
 										break;
 									}
 									case "text": {
 										el.element.textContent = value;
 										break;
+									}
+									default: {
+										if (el.element.hasOwnProperty(el.property)) {
+											el.element[el.property] = value;
+										}
 									}
 								}
 							});
