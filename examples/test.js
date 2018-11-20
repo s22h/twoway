@@ -1,12 +1,9 @@
-(function () {
-	"use strict";
+import Twoway from "../src/twoway.js"
 
-	document.querySelector('button').addEventListener('click', function () {
-		twoway.scope.input = 'You clicked the button!';
-	});
+const twoway = new Twoway();
 
-	twoway.bind(document.getElementById("bindme"), [{
-		property: "text",
-		variable: "input"
-	}]);
-})();
+document.querySelector("button").addEventListener("click", () => {
+	twoway.dataStore.input = "You clicked the button!";
+});
+
+twoway.bind(document.getElementById("bindme"), ["text:input"]);

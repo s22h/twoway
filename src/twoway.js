@@ -1,89 +1,105 @@
-(function () {
-	"use strict";
+export default class Twoway {
+	constructor()
+	{
+		this._data = {};
+		this._setter = {};
+		this.bindHtmlElements();
+	}
 
-	let twoway = {
-		scope: {
-			_data: {}
-		},
-		bind: function(element, bindProperties) {
-			for (let i = 0; i < bindProperties.length; i++) {
-				let bindProperty = bindProperties[i];
+	get dataStore()
+	{
+		return this._setter;
+	}
 
-				if (!twoway.scope._data[bindProperty.variable]) {
-					twoway.scope._data[bindProperty.variable] = {
-						value: element[bindProperty.property],
-						elements: []
-					};
-					let decl = {
-						set: function (value) {
-							this._data[bindProperty.variable].value = value;
-							this._data[bindProperty.variable].elements.forEach(function (el) {
-								switch (el.property) {
-									case "html": {
-										el.element.innerHTML = value;
-										break;
-									}
-									case "text": {
-										el.element.textContent = value;
-										break;
-									}
-									default: {
-										if (el.element.hasOwnProperty(el.property)) {
-											el.element[el.property] = value;
-										}
+	bind(element, props)
+	{
+		for (let i = 0; i < props.length; ++i) {
+			let tmp = props[i].split(":");
+
+			if (tmp.length <= 1) {
+				console.err("Malformed binding: ", props[i]);
+				continue;
+			}
+
+			let property = tmp[0].trim();
+			let variable = tmp[1].trim();
+
+			if (!this._data[variable]) {
+				this._data[variable] = {
+					value: element[property],
+					elements: []
+				}
+
+				let decl = {
+					set: (value) => {
+						this._data[variable].value = value;
+						this._data[variable].elements.forEach((el) => {
+							switch (el.property) {
+								case "html": {
+									el.element.innerHTML = value;
+									break;
+								}
+								case "text": {
+									el.element.textContent = value;
+									break;
+								}
+								default: {
+									if (el.property in el.element) {
+										el.element[el.property] = value;
 									}
 								}
-							});
-						},
-						get: function () {
-							return this._data[bindProperty.variable].value;
-						}
-					};
-					Object.defineProperty(twoway.scope, bindProperty.variable, decl);
-				}
-
-				twoway.scope._data[bindProperty.variable].elements.push({
-					element: element,
-					property: bindProperty.property
-				});
-
-				switch (bindProperty.property) {
-					case "value": {
-						element.addEventListener('input', function (evt) {
-							let value = evt.currentTarget.value;
-							twoway.scope[bindProperty.variable] = value;
+							}
 						});
-						break;
+					},
+					get: () => {
+						return this._data[variable].value;
 					}
 				}
+
+				Object.defineProperty(this._setter, variable, decl);
 			}
-		},
-		bindElement: function (bindee) {
-			let bindProperties = bindee.dataset.bind.split(",");
-			let data = [];
 
-			for (let i = 0; i < bindProperties.length; i++) {
-				let bindProperty = bindProperties[i].split(":");
+			this._data[variable].elements.push({
+				element: element,
+				property: property
+			});
 
-				if (bindProperty.length <= 1) {
-					console.err("Malformed binding: ", bindProperties[i]);
-					continue;
+			switch (property) {
+				case "value": {
+					element.addEventListener('input', (evt) => {
+						let value = evt.currentTarget.value;
+						this.dataStore[variable] = value;
+					});
+					break;
 				}
+			}
+		}
+	}
 
-				let elementProperty = bindProperty[0].trim();
-				let variable = bindProperty[1].trim();
+	bindElement(bindee)
+	{
+		let props = bindee.dataset.bind.split(",");
+		let data = [];
 
-				data.push({
-					property: elementProperty,
-					variable: variable
-				});
+		for (let i = 0; i < props.length; ++i) {
+			let tmp = props[i].split(":");
+
+			if (tmp.length <= 1) {
+				console.err("Malformed binding: ", properties[i]);
+				continue;
 			}
 
-			twoway.bind(bindee, data);
+			let property = tmp[0].trim();
+			let variable = tmp[1].trim();
+
+			data.push(property + ":" + variable);
 		}
-	};
 
-	Array.prototype.forEach.call(document.querySelectorAll('[data-bind]'), twoway.bindElement);
+		this.bind(bindee, data);
+	}
 
-	window.twoway = twoway;
-})();
+	bindHtmlElements()
+	{
+		document.querySelectorAll('[data-bind]').forEach((element) => { this.bindElement(element); });
+	}
+}
