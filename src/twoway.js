@@ -17,7 +17,7 @@ export default class Twoway {
 			let tmp = props[i].split(":");
 
 			if (tmp.length <= 1) {
-				console.err("Malformed binding: ", props[i]);
+				console.error("Malformed binding: ", props[i]);
 				continue;
 			}
 
@@ -85,7 +85,7 @@ export default class Twoway {
 			let tmp = props[i].split(":");
 
 			if (tmp.length <= 1) {
-				console.err("Malformed binding: ", properties[i]);
+				console.error("Malformed binding: ", properties[i]);
 				continue;
 			}
 

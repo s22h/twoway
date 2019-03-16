@@ -66,7 +66,7 @@
 				let bindProperty = bindProperties[i].split(":");
 
 				if (bindProperty.length <= 1) {
-					console.err("Malformed binding: ", bindProperties[i]);
+					console.error("Malformed binding: ", bindProperties[i]);
 					continue;
 				}
 
